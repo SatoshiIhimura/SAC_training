@@ -1,0 +1,19 @@
+* {
+  box-sizing: border-box;
+}
+
+html {
+  font-family: Inter, "Noto Sans JP", "Yu Gothic UI", Meiryo, sans-serif;
+  background: #f7faf6;
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+  min-height: 100vh;
+}
+
+button,
+input {
+  font-family: inherit;
+}
