@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { registerUser } from './registerUser'
+import { registerUser } from './userRegistrationApi'
 import { validateRegistration } from './validation'
 import './registration.css'
 

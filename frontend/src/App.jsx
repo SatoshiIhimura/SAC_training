@@ -1,43 +1,22 @@
-import { useEffect, useState } from 'react'
-import LoginPage from './features/authentication/LoginPage'
-import LoginSuccessPage from './features/authentication/LoginSuccessPage'
+import { useState } from 'react'
 import RegisterPage from './features/user-registration/RegisterPage'
-
-function getInitialPage() {
-  return window.location.pathname === '/register' ? 'register' : 'login'
-}
+import LoginPage from './features/auth/LoginPage'
+import PostPage from './features/posts/PostPage'
 
 export default function App() {
-  const [page, setPage] = useState(getInitialPage)
-  const [loginUser, setLoginUser] = useState(null)
-
-  useEffect(() => {
-    const handlePopState = () => setPage(getInitialPage())
-    window.addEventListener('popstate', handlePopState)
-    return () => window.removeEventListener('popstate', handlePopState)
-  }, [])
+  const saved = sessionStorage.getItem('post-system-auth')
+  const [auth, setAuth] = useState(saved ? JSON.parse(saved) : null)
+  const [page, setPage] = useState(auth ? 'posts' : (location.pathname === '/register' ? 'register' : 'login'))
 
   const navigate = (nextPage) => {
-    const path = nextPage === 'register' ? '/register' : '/login'
+    const path = nextPage === 'posts' ? '/posts' : nextPage === 'login' ? '/login' : '/register'
     window.history.pushState({}, '', path)
     setPage(nextPage)
   }
 
-  if (page === 'register') {
-    return <RegisterPage onRegistered={() => navigate('login')} onBack={() => navigate('login')} />
-  }
-
-  if (page === 'success') {
-    return <LoginSuccessPage user={loginUser} onBack={() => navigate('login')} />
-  }
-
-  return (
-    <LoginPage
-      onRegister={() => navigate('register')}
-      onLogin={(user) => {
-        setLoginUser(user)
-        setPage('success')
-      }}
-    />
-  )
+  const loggedIn = (data) => { sessionStorage.setItem('post-system-auth', JSON.stringify(data)); setAuth(data); navigate('posts') }
+  const logout = () => { sessionStorage.removeItem('post-system-auth'); setAuth(null); navigate('login') }
+  if (page === 'posts' && auth) return <PostPage auth={auth} onLogout={logout} />
+  if (page === 'register') return <RegisterPage onRegistered={() => navigate('login')} onBack={() => navigate('login')} />
+  return <LoginPage onLoggedIn={loggedIn} onRegister={() => navigate('register')} />
 }
